@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@clerk/nextjs';
-import useTodoStore from '@/lib/store/todoStore';
+import { useInstantTodos } from '@/lib/hooks/useInstantTodos';
 import TodoItem from '@/components/TodoItem';
 import AddTodo from '@/components/AddTodo';
 import Stats from '@/components/Stats';
@@ -12,20 +12,26 @@ import { AuthButton } from '@/components/AuthButton';
 
 export default function Home() {
   const {
-    filteredTodos,
-    stats,
+    todos,
+    isLoading,
+    error,
     addTodo,
     toggleTodo,
     deleteTodo,
-    setFilter,
-  } = useTodoStore();
+  } = useInstantTodos();
 
   const { isSignedIn } = useAuth();
   const [currentFilter, setCurrentFilter] = useState<'all' | 'active' | 'completed'>('all');
 
+  // Filter todos locally based on current filter
+  const filteredTodos = todos.filter(todo => {
+    if (currentFilter === 'active') return !todo.completed;
+    if (currentFilter === 'completed') return todo.completed;
+    return true;
+  });
+
   const handleFilterChange = (filter: 'all' | 'active' | 'completed') => {
     setCurrentFilter(filter);
-    setFilter({ status: filter });
   };
 
   return (
@@ -45,19 +51,29 @@ export default function Home() {
               Stay organized
             </p>
           </div>
-          <AuthButton />
+          {isSignedIn && <AuthButton />}
         </motion.div>
 
         {isSignedIn ? (
           <div className="space-y-2">
             {/* Stats - Mobile First */}
-            <Stats stats={stats()} />
+            <Stats stats={{
+              total: filteredTodos.length,
+              completed: filteredTodos.filter(t => t.completed).length,
+              active: filteredTodos.filter(t => !t.completed).length,
+              overdue: filteredTodos.filter(t => !t.completed && new Date(t.dueDate) < new Date()).length,
+            }} />
 
             {/* Filter Bar - Mobile Optimized */}
             <FilterBar 
               currentFilter={currentFilter} 
               onFilterChange={handleFilterChange} 
-              stats={stats()}
+              stats={{
+                total: filteredTodos.length,
+                completed: filteredTodos.filter(t => t.completed).length,
+                active: filteredTodos.filter(t => !t.completed).length,
+                overdue: filteredTodos.filter(t => !t.completed && new Date(t.dueDate) < new Date()).length,
+              }}
             />
 
             {/* Add Todo - Mobile Optimized */}
@@ -66,19 +82,19 @@ export default function Home() {
             {/* Todo List - Mobile Optimized */}
             <div className="space-y-2">
               <AnimatePresence>
-                {filteredTodos().map((todo, index) => (
+                {filteredTodos.map((todo: any, index: number) => (
                   <TodoItem
                     key={todo.id}
                     todo={todo}
-                    onToggle={toggleTodo}
-                    onDelete={deleteTodo}
+                    onToggle={() => toggleTodo(todo.id)}
+                    onDelete={() => deleteTodo(todo.id)}
                   />
                 ))}
               </AnimatePresence>
             </div>
 
             {/* Empty State - Mobile Optimized */}
-            {filteredTodos().length === 0 && (
+            {filteredTodos.length === 0 && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}

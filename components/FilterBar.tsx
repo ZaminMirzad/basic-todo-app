@@ -10,6 +10,7 @@ interface FilterBarProps {
     total: number;
     completed: number;
     active: number;
+    overdue: number;
   };
 }
 
