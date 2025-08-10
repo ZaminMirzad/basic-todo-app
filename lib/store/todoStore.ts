@@ -8,7 +8,7 @@ export interface Todo {
   category: string;
   dueDate: string;
   priority: 'low' | 'medium' | 'high';
-  createdAt: string;
+  createdAt: number;
   updatedAt?: string;
 }
 
@@ -49,7 +49,7 @@ const useTodoStore = create<TodoState>()(
           category: 'Work',
           dueDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
           priority: 'high',
-          createdAt: new Date().toISOString(),
+          createdAt: Date.now(),
         },
         {
           id: '2',
@@ -58,7 +58,7 @@ const useTodoStore = create<TodoState>()(
           category: 'Design',
           dueDate: new Date(Date.now() + 172800000).toISOString().split('T')[0],
           priority: 'medium',
-          createdAt: new Date().toISOString(),
+          createdAt: Date.now(),
         },
         {
           id: '3',
@@ -67,7 +67,7 @@ const useTodoStore = create<TodoState>()(
           category: 'Work',
           dueDate: new Date(Date.now() + 259200000).toISOString().split('T')[0],
           priority: 'high',
-          createdAt: new Date().toISOString(),
+          createdAt: Date.now(),
         },
         {
           id: '4',
@@ -76,25 +76,25 @@ const useTodoStore = create<TodoState>()(
           category: 'Work',
           dueDate: new Date(Date.now() - 86400000).toISOString().split('T')[0],
           priority: 'low',
-          createdAt: new Date().toISOString(),
+          createdAt: Date.now(),
         },
         {
           id: '5',
           title: 'Evening gym session - legs day',
           completed: false,
           category: 'Personal',
-          dueDate: new Date().toISOString().split('T')[0],
+          dueDate: new Date(Date.now()).toISOString().split('T')[0],
           priority: 'medium',
-          createdAt: new Date().toISOString(),
+          createdAt: Date.now(),
         },
         {
           id: '6',
           title: 'Grocery shopping for the week',
           completed: true,
           category: 'Personal',
-          dueDate: new Date().toISOString().split('T')[0],
+          dueDate: new Date(Date.now()).toISOString().split('T')[0],
           priority: 'medium',
-          createdAt: new Date().toISOString(),
+          createdAt: Date.now(),
         }
       ],
       filter: { status: 'all' },
@@ -105,7 +105,7 @@ const useTodoStore = create<TodoState>()(
         const newTodo: Todo = {
           ...todoData,
           id: Date.now().toString(),
-          createdAt: new Date().toISOString(),
+          createdAt: Date.now(),
         };
         set((state) => ({ todos: [...state.todos, newTodo] }));
       },
@@ -206,6 +206,39 @@ const useTodoStore = create<TodoState>()(
     }),
     {
       name: 'todo-storage',
+      storage: typeof window !== 'undefined' ? {
+        getItem: (name) => {
+          try {
+            const item = localStorage.getItem(name);
+            return item ? JSON.parse(item) : null;
+          } catch (error) {
+            console.error('Error parsing stored data:', error);
+            localStorage.removeItem(name);
+            return null;
+          }
+        },
+        setItem: (name, value) => {
+          try {
+            localStorage.setItem(name, JSON.stringify(value));
+          } catch (error) {
+            console.error('Error storing data:', error);
+          }
+        },
+        removeItem: (name) => {
+          localStorage.removeItem(name);
+        },
+      } : undefined,
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.error('Error rehydrating todo store:', error);
+          // Clear corrupted storage
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('todo-storage');
+          }
+        } else {
+          console.log('Todo store rehydrated successfully:', state);
+        }
+      },
     }
   )
 );

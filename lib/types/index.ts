@@ -5,8 +5,7 @@ export interface Todo {
   category: string;
   dueDate: string;
   priority: 'low' | 'medium' | 'high';
-  createdAt: string;
-  updatedAt?: string;
+  createdAt: number;
 }
 
 export interface TodoFormData {

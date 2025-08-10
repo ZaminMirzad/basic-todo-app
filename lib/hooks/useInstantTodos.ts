@@ -18,9 +18,13 @@ export function useInstantTodos() {
   const addTodo = (todoData: Omit<Todo, 'id' | 'createdAt' | 'userId'>) => {
     db.transact(
       db.tx.todos[id()].update({
-        ...todoData,
+        title: todoData.title,
+        category: todoData.category,
+        dueDate: todoData.dueDate,
+        priority: todoData.priority,
+        completed: todoData.completed || false,
         userId: currentUserId,
-        createdAt: Date.now().toString(),
+        createdAt: Date.now(),
       })
     )
   }
@@ -39,12 +43,17 @@ export function useInstantTodos() {
   }
 
   const updateTodo = (id: string, updates: Partial<Todo>) => {
+    const instantUpdates: any = { ...updates };
+    // TypeScript will handle the conversion since InstantDB schema matches
     db.transact(
-      db.tx.todos[id].update(updates)
+      db.tx.todos[id].update(instantUpdates)
     )
   }
 
-  const todos = (data?.todos || []) as Todo[]
+  const todos = (data?.todos || []).map(todo => ({
+    ...todo,
+    priority: todo.priority as 'low' | 'medium' | 'high',
+  }))
 
   return {
     todos,

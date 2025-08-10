@@ -9,7 +9,7 @@ const schema = i.schema({
       priority: i.string(),
       dueDate: i.string(),
       completed: i.boolean(),
-      createdAt: i.string(),
+      createdAt: i.number(),
       userId: i.string().indexed(),
     })
   }
