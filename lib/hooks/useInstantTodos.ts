@@ -43,7 +43,7 @@ export function useInstantTodos() {
   }
 
   const updateTodo = (id: string, updates: Partial<Todo>) => {
-    const instantUpdates: any = { ...updates };
+    const instantUpdates = { ...updates };
     // TypeScript will handle the conversion since InstantDB schema matches
     db.transact(
       db.tx.todos[id].update(instantUpdates)
