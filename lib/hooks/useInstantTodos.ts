@@ -1,7 +1,8 @@
 'use client'
 
 import { useAuth } from '@clerk/nextjs'
-import { db, type Todo } from '@/lib/instantdb'
+import type { Todo } from '@/lib/types';
+import { db } from '@/lib/instantdb'
 import { id } from '@instantdb/react'
 
 export function useInstantTodos() {
@@ -19,13 +20,13 @@ export function useInstantTodos() {
       db.tx.todos[id()].update({
         ...todoData,
         userId: currentUserId,
-        createdAt: Date.now(),
+        createdAt: Date.now().toString(),
       })
     )
   }
 
   const toggleTodo = (id: string) => {
-    const todo = data?.todos?.find((t: any) => t.id === id)
+    const todo = data?.todos?.find((t) => t.id === id)
     if (todo) {
       db.transact(
         db.tx.todos[id].update({ completed: !todo.completed })
@@ -43,7 +44,7 @@ export function useInstantTodos() {
     )
   }
 
-  const todos = data?.todos || []
+  const todos = (data?.todos || []) as Todo[]
 
   return {
     todos,

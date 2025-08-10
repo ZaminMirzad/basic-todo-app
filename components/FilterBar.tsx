@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Filter, TrendingUp, CheckCircle, Clock } from 'lucide-react';
+import { Filter, CheckCircle, Clock } from 'lucide-react';
 
 interface FilterBarProps {
   currentFilter: 'all' | 'active' | 'completed';

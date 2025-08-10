@@ -13,8 +13,6 @@ import { AuthButton } from '@/components/AuthButton';
 export default function Home() {
   const {
     todos,
-    isLoading,
-    error,
     addTodo,
     toggleTodo,
     deleteTodo,
@@ -82,7 +80,7 @@ export default function Home() {
             {/* Todo List - Mobile Optimized */}
             <div className="space-y-2">
               <AnimatePresence>
-                {filteredTodos.map((todo: any, index: number) => (
+                {filteredTodos.map((todo) => (
                   <TodoItem
                     key={todo.id}
                     todo={todo}

@@ -9,7 +9,7 @@ const schema = i.schema({
       priority: i.string(),
       dueDate: i.string(),
       completed: i.boolean(),
-      createdAt: i.number(),
+      createdAt: i.string(),
       userId: i.string().indexed(),
     })
   }
@@ -21,14 +21,4 @@ export const db = init({
   schema,
 })
 
-// Type definitions
-export type Todo = {
-  id: string
-  title: string
-  category: string
-  priority: string
-  dueDate: string
-  completed: boolean
-  createdAt: number
-  userId: string
-}
+

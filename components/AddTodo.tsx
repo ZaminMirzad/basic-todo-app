@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Calendar, ChevronDown } from 'lucide-react';
+import { Plus} from 'lucide-react';
 interface TodoFormData {
   title: string;
   category: string;
